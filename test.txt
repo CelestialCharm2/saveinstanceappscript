@@ -1,12 +1,8 @@
-local ServerScriptService = game:GetService("ServerScriptService")
-
-function saveScripts(sourceParent)
-    for _, obj in pairs(sourceParent:GetChildren()) do
-        if obj:IsA("Script") or obj:IsA("ModuleScript") then
-            obj.Parent = ServerScriptService
+for _, v in pairs(game:GetService("ServerScriptService"):GetChildren()) do
+    if v:IsA("Script") or v:IsA("ModuleScript") then
+        local scriptSource = decompile(v) -- Decompiles the script
+        if scriptSource then
+            writefile("SavedScripts/" .. v.Name .. ".lua", scriptSource) -- Saves the script locally
         end
     end
 end
-
--- Example Usage: Move all scripts from Workspace to ServerScriptService
-saveScripts(game.Workspace)
