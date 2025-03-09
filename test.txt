@@ -1,5 +1,13 @@
 for _, v in pairs(game:GetService("ServerScriptService"):GetChildren()) do
     if v:IsA("Script") or v:IsA("ModuleScript") then
-        saveinstance(v) -- Saves the script instance using your executor's function
+        local success, err = pcall(function()
+            saveinstance(v) -- Attempts to save the script instance
+        end)
+        
+        if success then
+            print("Successfully saved: " .. v.Name)
+        else
+            warn("Failed to save: " .. v.Name .. " | Error: " .. err)
+        end
     end
 end
