@@ -1,8 +1,5 @@
 for _, v in pairs(game:GetService("ServerScriptService"):GetChildren()) do
     if v:IsA("Script") or v:IsA("ModuleScript") then
-        local scriptSource = decompile(v) -- Decompiles the script
-        if scriptSource then
-            writefile("SavedScripts/" .. v.Name .. ".lua", scriptSource) -- Saves the script locally
-        end
+        saveinstance(v) -- Saves the script instance using your executor's function
     end
 end
