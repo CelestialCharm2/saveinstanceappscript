@@ -1,0 +1,12 @@
+local ServerScriptService = game:GetService("ServerScriptService")
+
+function saveScripts(sourceParent)
+    for _, obj in pairs(sourceParent:GetChildren()) do
+        if obj:IsA("Script") or obj:IsA("ModuleScript") then
+            obj.Parent = ServerScriptService
+        end
+    end
+end
+
+-- Example Usage: Move all scripts from Workspace to ServerScriptService
+saveScripts(game.Workspace)
