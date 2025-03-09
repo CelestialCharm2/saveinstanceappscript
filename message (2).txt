@@ -1,7 +1,61 @@
-local Params = {
- RepoURL = "https://raw.githubusercontent.com/luau/SynSaveInstance/main/",
- SSI = "saveinstance",
-}
-local synsaveinstance = loadstring(game:HttpGet(Params.RepoURL .. Params.SSI .. ".luau", true), Params.SSI)()
-local Options = {nilinstances = true} -- Documentation here https://luau.github.io/UniversalSynSaveInstance/api/SynSaveInstance
-synsaveinstance(Options)
+local FileSystem = {}
+
+function FileSystem:CaptureGame()
+    local gameData = {
+        serverScripts = {},
+        clientScripts = {},
+        modules = {},
+        assets = {}
+    }
+    
+    -- Capture server-side content
+    for _, service in ipairs({game:GetService("ServerScriptService"), game:GetService("ServerStorage")}) do
+        for _, item in ipairs(service:GetDescendants()) do
+            if item:IsA("LuaSourceContainer") then
+                gameData.serverScripts[item:GetFullName()] = {
+                    source = item.Source,
+                    className = item.ClassName,
+                    properties = self:GetProperties(item)
+                }
+            end
+        end
+    end
+    
+    -- Capture client-side content
+    for _, service in ipairs({game:GetService("ReplicatedStorage"), game:GetService("StarterGui"), game:GetService("ReplicatedFirst")}) do --Added ReplicatedFirst
+        for _, item in ipairs(service:GetDescendants()) do
+            if item:IsA("LuaSourceContainer") then
+                gameData.clientScripts[item:GetFullName()] = {
+                    source = item.Source,
+                    className = item.ClassName,
+                    properties = self:GetProperties(item)
+                }
+            end
+        end
+    end
+
+    -- Capture modules
+    for _, item in ipairs(game:GetDescendants()) do
+        if item:IsA("ModuleScript") then
+            gameData.modules[item:GetFullName()] = {
+                source = item.Source,
+                className = item.ClassName,
+                properties = self:GetProperties(item)
+            }
+        end
+    end
+    
+    return gameData
+end
+
+function FileSystem:GetProperties(instance)
+    local properties = {}
+    for _, prop in ipairs({"Name", "Parent", "Disabled"}) do
+        pcall(function()
+            properties[prop] = instance[prop]
+        end)
+    end
+    return properties
+end
+
+return FileSystem
